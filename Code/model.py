@@ -86,7 +86,7 @@ class UNet(nn.Module):
         self.uconv4_2 = nn.Conv2d(64,64,3,padding=pad)
         self.urelu4_2 = nn.ReLU(inplace=True)
         
-        self.seg = nn.Conv2d(64,n_class,1,padding=pad)
+        self.seg = nn.Conv2d(64,n_class,1,padding=0)
         
 #        self._initialize_weights()
     
