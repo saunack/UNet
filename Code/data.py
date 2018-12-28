@@ -51,7 +51,7 @@ class Segmentation(Dataset):
 def train(epochs=2,pad = 2):
     dataset = Segmentation()
     model = UNet(n_class = 1).cuda() if torch.cuda.is_available() else UNet(n_class = 1)
-    optimizer = torch.optim.SGD(model.parameters(),lr = 0.03, momentum = 0.8, weight_decay = 0.0005)
+    optimizer = torch.optim.SGD(model.parameters(),lr = 0.03, momentum = 0.99, weight_decay = 0.0005)
     loss_log = []
     criterion = nn.BCELoss()
 
@@ -60,7 +60,7 @@ def train(epochs=2,pad = 2):
     for epoch in range(epochs):
         print("Starting Epoch #", epoch)
 
-        train_loader = DataLoader(dataset=dataset, batch_size=5, shuffle=True)
+        train_loader = DataLoader(dataset=dataset, batch_size=1, shuffle=True)
         epoch_loss = 0
 
         for i,images in enumerate(train_loader):
