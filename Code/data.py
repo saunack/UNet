@@ -53,7 +53,7 @@ def train(epochs=2,pad = 2):
     model = UNet(n_class = 1).cuda() if torch.cuda.is_available() else UNet(n_class = 1)
     optimizer = torch.optim.SGD(model.parameters(),lr = 0.03, momentum = 0.99, weight_decay = 0.0005)
     loss_log = []
-    criterion = nn.BCELoss()
+    criterion = nn.BCEWithLogitsLoss()
 
     print("Starting training")
 
