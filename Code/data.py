@@ -36,9 +36,9 @@ class Segmentation(Dataset):
 			'segmented': torchvision.transforms.ToTensor()(self.annotations)
 		}
         
-        if torch.cuda.is_available():
-            sample['image'] = sample['image'].cuda()
-            sample['segmented'] = sample['segmented'].cuda()
+		if torch.cuda.is_available():
+			sample['image'] = sample['image'].cuda()
+			sample['segmented'] = sample['segmented'].cuda()
         
 		if self.transform:
 			sample = self.transform(sample)
