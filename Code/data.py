@@ -60,7 +60,7 @@ def train(epochs=2,pad = 2):
     for epoch in range(epochs):
         print("Starting Epoch #", epoch)
 
-        train_loader = DataLoader(dataset=dataset, batch_size=2, shuffle=True)
+        train_loader = DataLoader(dataset=dataset, batch_size=1, shuffle=True)
         epoch_loss = 0
 
         for i,images in enumerate(train_loader):
@@ -86,4 +86,4 @@ def train(epochs=2,pad = 2):
         print("Epoch ",epoch," finished. Loss : ",loss)
         epoch_loss = 0
         
-train(1)
+train(10)
