@@ -32,8 +32,8 @@ class Segmentation(Dataset):
 			#torchvision.transforms.ToTensor()(self.annotations)[0])
 
 		sample = {
-			'image': torchvision.transforms.ToTensor()(self.images)[0].unsqueeze(0),
-			'segmented': torchvision.transforms.ToTensor()(self.annotations)[0].unsqueeze(0)
+			'image': torchvision.transforms.ToTensor()(self.images),
+			'segmented': torchvision.transforms.ToTensor()(self.annotations)
 		}
 		
 		if self.transform:
@@ -45,21 +45,24 @@ class Segmentation(Dataset):
 		return self.images
 
 def train(epochs=2,pad = 2):
-    dt = Segmentation()
+    dataset = Segmentation()
     model = UNet(n_class = 1)
     optim = torch.optim.SGD(model.parameters(),lr = 0.03, momentum = 0.8, weight_decay = 0.0005)
     loss_log = []
     criterion = nn.BCELoss()
+
+    print("Starting training")
+
     for epoch in range(epochs):
-        train_loader = DataLoader(dataset=dt, batch_size=5, shuffle=True)
+		    print("Starting Epoch #", epoch)
+
+        train_loader = DataLoader(dataset=dataset, batch_size=5, shuffle=True)
         epoch_loss = 0
+
         for i,images in enumerate(train_loader):
             ## Run the forward pass
-            if len(images['image'].size()) == 0  or len(images['segmented'].size()) == 0:
-                exit(1)
             outputs = model.forward(images['image'])
-            if len(outputs.size()) == 0:
-                exit(2)
+
             loss = criterion(outputs, images['segmented'])
             loss_log.append(loss.item())
             epoch_loss = epoch_loss + loss.item()
@@ -67,7 +70,8 @@ def train(epochs=2,pad = 2):
             optim.zero_grad()
             loss.backward()
             optim.step()
-            print("Epoch : ",epoch,", batch : ",i)
+
+            print("Epoch #", epoch, "Batch #",i)
         
         print("Epoch ",epoch," finished. Loss : ",loss)
         epoch_loss = 0
