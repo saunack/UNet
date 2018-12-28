@@ -81,7 +81,7 @@ def train(epochs=2,pad = 2):
             
             optimizer.step()
 
-            print("Epoch #", epoch, "Batch #",i)
+            print("Epoch #", epoch, "Batch #", i, " Loss: ", loss.item())
         
         print("Epoch ",epoch," finished. Loss : ",loss)
         epoch_loss = 0
