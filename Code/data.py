@@ -45,8 +45,8 @@ class Segmentation(Dataset):
 		return self.images
 
 def train(epochs=2,pad = 2):
-    dataset = Segmentation().cuda()
-    model = UNet(n_class = 1)
+    dataset = Segmentation()
+    model = UNet(n_class = 1).cuda()
     optimizer = torch.optim.SGD(model.parameters(),lr = 0.03, momentum = 0.8, weight_decay = 0.0005)
     loss_log = []
     criterion = nn.BCELoss()
