@@ -35,7 +35,11 @@ class Segmentation(Dataset):
 			'image': torchvision.transforms.ToTensor()(self.images),
 			'segmented': torchvision.transforms.ToTensor()(self.annotations)
 		}
-		
+        
+        if torch.cuda.is_available():
+            sample['image'] = sample['image'].cuda()
+            sample['segmented'] = sample['segmented'].cuda()
+        
 		if self.transform:
 			sample = self.transform(sample)
 
@@ -46,7 +50,7 @@ class Segmentation(Dataset):
 
 def train(epochs=2,pad = 2):
     dataset = Segmentation()
-    model = UNet(n_class = 1).cuda()
+    model = UNet(n_class = 1).cuda() if torch.cuda.is_available() else UNet(n_class = 1)
     optimizer = torch.optim.SGD(model.parameters(),lr = 0.03, momentum = 0.8, weight_decay = 0.0005)
     loss_log = []
     criterion = nn.BCELoss()
@@ -67,7 +71,7 @@ def train(epochs=2,pad = 2):
             optimizer.zero_grad()
             
             ## Run the forward pass
-            outputs = model.forward(image).cuda() 
+            outputs = model.forward(image).cuda() if torch.cuda.is_available() else model.forward(image)
             loss = criterion(outputs, label)
             loss.backward()
             
