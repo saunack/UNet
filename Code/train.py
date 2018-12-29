@@ -16,7 +16,7 @@ def train(epochs = 2):
     model = UNet(n_class = 2).cuda() if torch.cuda.is_available() else UNet(n_class = 2)
     optimizer = torch.optim.SGD(model.parameters(), lr = 0.03, momentum = 0.99, weight_decay = 0.0005)
     loss_log = []
-    criterion = torch.nn.CrossEntropyLoss(reduction='sum')
+    criterion = torch.nn.CrossEntropyLoss()
 
     for epoch in range(epochs):
         print("Starting Epoch #{}".format(epoch))

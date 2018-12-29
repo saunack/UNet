@@ -52,7 +52,7 @@ class UNet(nn.Module):
         if bilinear:
             self.upool1 = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
         else:
-            self.upool1 = nn.ConvTranspose2d(1024,512,2,stride=2,bias=False)
+            self.upool1 = nn.ConvTranspose2d(1024,512,2,stride=2)
         self.uconv1_1 = nn.Conv2d(1024,512,3,padding=pad)
         self.urelu1_1 = nn.ReLU(inplace=True)
         self.uconv1_2 = nn.Conv2d(512,512,3,padding=pad)
@@ -63,7 +63,7 @@ class UNet(nn.Module):
         if bilinear:
             self.upool2 = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
         else:
-            self.upool2 = nn.ConvTranspose2d(512,256,2,stride=2,bias=False)
+            self.upool2 = nn.ConvTranspose2d(512,256,2,stride=2)
         self.uconv2_1 = nn.Conv2d(512,256,3,padding=pad)
         self.urelu2_1 = nn.ReLU(inplace=True)
         self.uconv2_2 = nn.Conv2d(256,256,3,padding=pad)
@@ -74,7 +74,7 @@ class UNet(nn.Module):
         if bilinear:
             self.upool3 = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
         else:
-            self.upool3 = nn.ConvTranspose2d(256,128,2,stride=2,bias=False)
+            self.upool3 = nn.ConvTranspose2d(256,128,2,stride=2)
         self.uconv3_1 = nn.Conv2d(256,128,3,padding=pad)
         self.urelu3_1 = nn.ReLU(inplace=True)
         self.uconv3_2 = nn.Conv2d(128,128,3,padding=pad)
@@ -85,7 +85,7 @@ class UNet(nn.Module):
         if bilinear:
             self.upool4 = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
         else:
-            self.upool4 = nn.ConvTranspose2d(128,64,2,stride=2,bias=False)
+            self.upool4 = nn.ConvTranspose2d(128,64,2,stride=2)
         self.uconv4_1 = nn.Conv2d(128,64,3,padding=pad)
         self.urelu4_1 = nn.ReLU(inplace=True)
         self.uconv4_2 = nn.Conv2d(64,64,3,padding=pad)
@@ -95,12 +95,13 @@ class UNet(nn.Module):
         self.seg = nn.Conv2d(64,n_class,1,padding=pad)
         
         #self._init_weights()
-#        self._initialize_weights()
+        self._initialize_weights()
     
     def _init_weights(self):
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 nn.init.kaiming_normal_(m, nonlinearity='relu')
+                #nn.init.xavier_uniform(conv1.weight)
 
     def _initialize_weights(self):
         for m in self.modules():
@@ -108,10 +109,10 @@ class UNet(nn.Module):
                 m.weight.data.zero_()
                 if m.bias is not None:
                     m.bias.data.zero_()
-            if isinstance(m, nn.ConvTranspose2d):
-                assert m.kernel_size[0] == m.kernel_size[1]
-                initial_weight = get_upsampling_weight(m.in_channels, m.out_channels, m.kernel_size[0])
-                m.weight.data.copy_(initial_weight)
+            #if isinstance(m, nn.ConvTranspose2d):
+                #assert m.kernel_size[0] == m.kernel_size[1]
+                #initial_weight = get_upsampling_weight(m.in_channels, m.out_channels, m.kernel_size[0])
+                #m.weight.data.copy_(initial_weight)
 
     def concat(self, x2, x1):
         #x1 has bigger dimensions than x2
