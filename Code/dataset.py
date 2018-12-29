@@ -137,12 +137,12 @@ class Segmentation(Dataset):
 			'segmented': self.annotations
 		}
         
+		if self.transform:
+			sample = self.transform(sample)
+		
 		if torch.cuda.is_available():
 			sample['image'] = sample['image'].cuda()
 			sample['segmented'] = sample['segmented'].cuda()
-        
-		if self.transform:
-			sample = self.transform(sample)
 
 		sample['segmented'] = sample['segmented'][0].long()
 
