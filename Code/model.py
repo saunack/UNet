@@ -2,7 +2,7 @@ import torch.nn as nn
 import os.path as osp
 import torch
 
-#TODO : BatchNorm
+# TODO : BatchNorm
 # https://github.com/milesial/Pytorch-UNet/
 
 class UNet(nn.Module):
