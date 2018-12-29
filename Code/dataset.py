@@ -50,12 +50,14 @@ class RandomFlip(object):
 		img, seg = sample['image'], sample['segmented']
 
 		if random.random() < self.p[0]:
+			# print("Horizontal flip")
 			img = F.hflip(img)
-			seg = F.hflip(img)
+			seg = F.hflip(seg)
 
 		if random.random() < self.p[1]:
+			# print("Vertical flip")
 			img = F.vflip(img)
-			seg = F.vflip(img)
+			seg = F.vflip(seg)
 
 		return {'image': img, 'segmented': seg}
 
@@ -76,6 +78,7 @@ class Pad(object):
 	def __call__(self, sample):
 		img = F.pad(sample['image'], self.padding, padding_mode=self.mode)
 		seg = F.pad(sample['segmented'], self.padding, padding_mode=self.mode)
+		# print("Padding - size {}, mode {}".format(self.padding, self.mode))
 
 		return {'image': img, 'segmented': seg}
 
@@ -96,6 +99,7 @@ class RandomAffine(object):
 	def __call__(self, sample):
 		degrees, translate, _, _ = T.RandomAffine.get_params(self.degrees, self.translate,
 			None, None, [1,1])
+		# print("Affine - rotate {} degrees, translate ({}, {})".format(degrees, translate[0], translate[1]))
 		
 		img = F.affine(sample['image'], degrees, translate, 1, 0)
 		seg = F.affine(sample['segmented'], degrees, translate, 1, 0)

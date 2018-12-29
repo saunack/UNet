@@ -5,9 +5,9 @@ from torchvision.transforms import Compose
 from model import UNet
 from dataset import Segmentation, RandomAffine, Pad, RandomFlip, CenterCrop, ToTensor
 
-def train(epochs=2, pad=2):
+def train(epochs = 2):
     dataset = Segmentation(transform = Compose([ \
-      Pad(92, mode='symmetric'), \
+      Pad(120, mode='symmetric'), \
       RandomAffine((0, 90), (31, 31)), \
 			RandomFlip(), \
 			CenterCrop(572, 388), \
