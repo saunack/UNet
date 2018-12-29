@@ -37,7 +37,7 @@ def elastic_transformations(alpha, sigma, interpolation_order=1):
 
 from PIL import Image
 #a = Image.open('UNet/Data/train-volume.tif')
-a = Image.open('grid.jpeg')
+a = Image.open('../Data/grid.jpeg')
 b = np.array(a)
 
 #e = elastic_transformations(1,10,interpolation_order=1)(b)
