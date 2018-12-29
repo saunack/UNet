@@ -3,13 +3,14 @@ from torch.utils.data import DataLoader
 from torch.nn import functional as F
 from torchvision.transforms import Compose
 from model import UNet
-from dataset import Segmentation, RandomAffine, Pad, RandomFlip, CenterCrop, ToTensor
+from dataset import Segmentation, RandomAffine, Pad, RandomFlip, CenterCrop, ToTensor, RandomWarp
 
 def train(epochs = 2):
     dataset = Segmentation(transform = Compose([ \
       Pad(120, mode='symmetric'), \
       RandomAffine((0, 90), (31, 31)), \
 			RandomFlip(), \
+			RandomWarp(),
 			CenterCrop(572, 388), \
 			ToTensor()
     ]))
