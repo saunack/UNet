@@ -4,6 +4,8 @@ from torchvision import transforms as T
 from torchvision.transforms import functional as F
 from PIL import Image
 from torch.utils.data import Dataset, DataLoader
+from deform import elastic
+import numpy as np
 
 class ToTensor(object):
 	""" Convert PIL Image to Tensor """
@@ -11,6 +13,30 @@ class ToTensor(object):
 	def __call__(self, sample):
 		img = F.to_tensor(sample['image'])
 		seg = F.to_tensor(sample['segmented'])
+
+		return {'image': img, 'segmented': seg}
+
+class RandomWarp(object):
+	""" Randomly apply elastic deformation to PIL Image """
+
+	"""
+	Args:
+		p (float, optional): probability of warping
+		alpha (float, optional): mean of gaussian
+		sigma (float, optional): stddev of gaussian
+	"""
+
+	def __init__(self, p=0.5, alpha=40, sigma=2000):
+		self.p = 2.0
+		self.param, self.deform = elastic(alpha, sigma)
+
+	def __call__(self, sample):
+		img, seg = sample['image'], sample['segmented']
+		
+		if random.random() < self.p:
+			dx, dy = self.param(np.array(img).size)
+			img = self.deform(img, dx, dy)
+			seg = self.deform(seg, dx, dy)
 
 		return {'image': img, 'segmented': seg}
 
