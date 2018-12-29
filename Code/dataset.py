@@ -1,7 +1,106 @@
 import torch
-import torchvision
+import random
+from torchvision import transforms as T
+from torchvision.transforms import functional as F
 from PIL import Image
 from torch.utils.data import Dataset, DataLoader
+
+class ToTensor(object):
+	""" Convert PIL Image to Tensor """
+
+	def __call__(self, sample):
+		img = F.to_tensor(sample['image'])
+		seg = F.to_tensor(sample['segmented'])
+
+		return {'image': img, 'segmented': seg}
+
+class CenterCrop(object):
+	""" Crop given image in sample """
+
+	"""
+	Args:
+		size (int): size of cropped image
+	"""
+
+	def __init__(self, img_size, seg_size):
+		self.img_size = img_size
+		self.seg_size = seg_size
+	
+	def __call__(self, sample):
+		img = F.center_crop(sample['image'], self.img_size)
+		seg = F.center_crop(sample['segmented'], self.seg_size)
+
+		return {'image': img, 'segmented': seg}
+
+class RandomFlip(object):
+	""" Randomly flip given image in sample """
+
+	"""
+	Args:
+		p (tuple or int): probability of flipping horizontally and vertically
+	"""
+
+	def __init__(self, p=0.5):
+		if isinstance(p, list):
+			self.p = p
+		else:
+			self.p = (p, p)
+	
+	def __call__(self, sample):
+		img, seg = sample['image'], sample['segmented']
+
+		if random.random() < self.p[0]:
+			img = F.hflip(img)
+			seg = F.hflip(img)
+
+		if random.random() < self.p[1]:
+			img = F.vflip(img)
+			seg = F.vflip(img)
+
+		return {'image': img, 'segmented': seg}
+
+class Pad(object):
+	""" Pad given image in sample """
+
+	"""
+	Args:
+		padding (int): Padding value
+		mode (string, optional): allowed modes same as in 
+			torchvision.transforms.Pad
+	"""
+
+	def __init__(self, padding, mode='constant'):
+		self.padding = padding
+		self.mode = mode
+	
+	def __call__(self, sample):
+		img = F.pad(sample['image'], self.padding, padding_mode=self.mode)
+		seg = F.pad(sample['segmented'], self.padding, padding_mode=self.mode)
+
+		return {'image': img, 'segmented': seg}
+
+class RandomAffine(object):
+	""" Randomly rotate and translate the image in sample """
+
+	"""
+	Args:
+		degrees (tuple): Range of rotation
+		translate (tuple): maximum absolute horizontal and 
+			vertical translations
+	"""
+
+	def __init__(self, degrees, translate):
+		self.degrees = degrees
+		self.translate = translate
+
+	def __call__(self, sample):
+		degrees, translate, _, _ = T.RandomAffine.get_params(self.degrees, self.translate,
+			None, None, [1,1])
+		
+		img = F.affine(sample['image'], degrees, translate, 1, 0)
+		seg = F.affine(sample['segmented'], degrees, translate, 1, 0)
+
+		return {'image': img, 'segmented': seg}
 
 class Segmentation(Dataset):
 	""" Segmentation dataset """
@@ -30,8 +129,8 @@ class Segmentation(Dataset):
 			#torchvision.transforms.ToTensor()(self.annotations)[0])
 
 		sample = {
-			'image': torchvision.transforms.ToTensor()(self.images),
-			'segmented': torchvision.transforms.ToTensor()(self.annotations)
+			'image': self.images,
+			'segmented': self.annotations
 		}
         
 		if torch.cuda.is_available():
@@ -41,8 +140,9 @@ class Segmentation(Dataset):
 		if self.transform:
 			sample = self.transform(sample)
 
+		sample['segmented'] = sample['segmented'][0].long()
+
 		return sample
 	
-	def image(self):
+	def get_images(self):
 		return self.images
-
