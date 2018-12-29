@@ -1,13 +1,5 @@
 import torch
 import numpy as np
-from torch.nn.functional import grid_sample
-
-#kernel = torch.tensor([1/16,1/8,1/16,1/8,1/4,1/8,1/16,\
-#	1/8,1/16]).reshape(3,3)
-sigma = 6
-kernel_dim = 23
-size = 320
-alpha = 30
 
 def create_kernel(kernel_size=23, sigma=6):
 	""" Create a 2D Gaussian kernel """
@@ -59,7 +51,7 @@ def create_deform_flow(size, kernel, alpha=30):
 		dx = torch.clamp(2*dx/size-1,-1,1)
 		dy = torch.clamp(2*dy/size-1,-1,1)
 
-		return dx, dy
+		return dy, dx
 	
 	dx, dy = displacement_vectors(size, kernel, alpha)
 	grid = torch.cat([dx.reshape(-1,1),dy.reshape(-1,1)],dim=1)
@@ -67,19 +59,11 @@ def create_deform_flow(size, kernel, alpha=30):
 
 	return grid
 
-def deform_grid(kernel_dim=23, sigma=6, size=320):
+def deform_grid(kernel_dim=23, sigma=6, alpha=30, img_size=320):
 	kernel = create_kernel(kernel_dim, sigma)
-	grid = create_deform_flow(size, kernel)
+	grid = create_deform_flow(img_size, kernel, alpha)
 
 	return grid
 
-grid = deform_grid()
-
-from PIL import Image
-from torchvision import transforms as T
-
-img = Image.open('../Data/grid.jpeg')
-t = T.ToTensor()
-pil = T.ToPILImage()
-
-dev = pil(grid_sample(t(img).unsqueeze(0), grid, padding_mode='reflection')[0])
+#grid = deform_grid()
+#grid_sample(img, grid, padding_mode='reflection')

@@ -4,7 +4,7 @@ from torchvision import transforms as T
 from torchvision.transforms import functional as F
 from PIL import Image
 from torch.utils.data import Dataset, DataLoader
-from deform import elastic
+from dd import deform_grid
 import numpy as np
 
 class ToTensor(object):
@@ -22,23 +22,28 @@ class RandomWarp(object):
 	"""
 	Args:
 		p (float, optional): probability of warping
-		alpha (float, optional): mean of gaussian
 		sigma (float, optional): stddev of gaussian
 	"""
 
-	def __init__(self, p=0.5, alpha=40, sigma=2000):
+	def __init__(self, p=0.5, kernel_dim=23, sigma=6, alpha=30):
 		self.p = 2.0
-		self.param, self.deform = elastic(alpha, sigma)
+		self.alpha = alpha
+		self.sigma = sigma
+		self.kernel_dim = kernel_dim
 
 	def __call__(self, sample):
 		img, seg = sample['image'], sample['segmented']
 		
 		if random.random() < self.p:
-			dx, dy = self.param(np.array(img).size)
-			img = self.deform(img, dx, dy)
-			seg = self.deform(seg, dx, dy)
+			grid = deform_grid(self.kernel_dim, self.sigma, \
+				self.alpha, img.size[0])
+			img = torch.nn.functional.grid_sample(T.ToTensor()\
+				(img).unsqueeze(0), grid)
+			seg = torch.nn.functional.grid_sample(T.ToTensor()\
+				(seg).unsqueeze(0), grid)
 
-		return {'image': img, 'segmented': seg}
+		return {'image': T.ToPILImage()(img[0]), 'segmented':\
+			T.ToPILImage()(seg[0])}
 
 class CenterCrop(object):
 	""" Crop given image in sample """
