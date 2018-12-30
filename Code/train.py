@@ -1,3 +1,4 @@
+import argparse
 import torch
 from torch.utils.data import DataLoader
 from torch.nn import functional as F
@@ -5,7 +6,17 @@ from torchvision.transforms import Compose
 from model import UNet
 from dataset import Segmentation, RandomAffine, Pad, RandomFlip, CenterCrop, ToTensor, RandomWarp
 
-def train(epochs = 2):
+def get_options():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-e","--epochs",type=int,dest="epochs",help="number of epochs",default=100)
+    parser.add_argument("-lr",type=float,dest="lr",help="learning rate",default=0.001)
+    parser.add_argument("-d","--decay",type=float,dest="decay",help="weight decay",default=0.005)
+    parser.add_argument("-m","--momentum",type=float,dest="momentum",help="learning momentum",default=0.9)
+
+    args = parser.parse_args()
+    train(args.epochs, args.lr, args.momentum)
+
+def train(epochs, lr, momentum, decay):
     dataset = Segmentation(transform = Compose([ \
       Pad(120, mode='symmetric'), \
       #RandomAffine((0, 90), (31, 31)), \
@@ -15,7 +26,7 @@ def train(epochs = 2):
 			ToTensor()
     ]))
     model = UNet(n_class = 2).cuda() if torch.cuda.is_available() else UNet(n_class = 2)
-    optimizer = torch.optim.SGD(model.parameters(), lr = 0.001, momentum = 0.99, weight_decay = 0.0005)
+    optimizer = torch.optim.SGD(model.parameters(), lr = lr, momentum = momentum, weight_decay = decay)
     loss_log = []
     # criterion = torch.nn.CrossEntropyLoss(reduction='sum')
     criterion = torch.nn.CrossEntropyLoss(reduction='mean')
@@ -49,4 +60,5 @@ def train(epochs = 2):
         print("Epoch",epoch," finished. Loss :",loss.item())
         epoch_loss = 0
     print(loss_log)
-train(60)
+
+get_options()
