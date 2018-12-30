@@ -154,7 +154,7 @@ class Segmentation(Dataset):
 		self.transform = transform
 	
 	def __len__(self):
-		return 30
+		return 10
 	
 	def __getitem__(self, idx):
 		self.images.seek(idx)
