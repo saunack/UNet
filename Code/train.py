@@ -22,7 +22,7 @@ def train(epochs, lr, momentum, decay):
       #RandomAffine((0, 90), (31, 31)), \
 			#RandomFlip(), \
 			#RandomWarp(),
-			CenterCrop(572, 388), \
+			CenterCrop(572, 570), \
 			ToTensor()
     ]))
     model = UNet(n_class = 2).cuda() if torch.cuda.is_available() else UNet(n_class = 2)
