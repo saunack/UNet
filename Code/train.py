@@ -38,15 +38,15 @@ def train(epochs = 2):
             loss = criterion(outputs, label)
             loss.backward()
             
-            loss_log.append(loss.item())
             epoch_loss = epoch_loss + loss.item()
             
             optimizer.step()
 
             if i % 10 == 0 :
                 print("Epoch #{} Batch #{} Loss: {}".format(epoch,i,loss.item()))
+        loss_log.append(epoch_loss)
         
-        print("Epoch",epoch," finished. Loss :",loss)
+        print("Epoch",epoch," finished. Loss :",loss.item())
         epoch_loss = 0
-        
+    print(loss_log)
 train(60)
