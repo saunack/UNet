@@ -32,7 +32,7 @@ def train(epochs, lr, momentum, decay):
     criterion = torch.nn.CrossEntropyLoss(reduction='mean')
 
     for epoch in range(epochs):
-        print("Starting Epoch #{}".format(epoch))
+        #print("Starting Epoch #{}".format(epoch))
 
         train_loader = DataLoader(dataset=dataset, batch_size=1, shuffle=True)
         epoch_loss = 0
@@ -57,7 +57,7 @@ def train(epochs, lr, momentum, decay):
                 print("Epoch #{} Batch #{} Loss: {}".format(epoch,i,loss.item()))
         loss_log.append(epoch_loss)
         
-        print("Epoch",epoch," finished. Loss :",loss.item())
+        #print("Epoch",epoch," finished. Loss :",loss.item())
         epoch_loss = 0
     print(loss_log)
 
