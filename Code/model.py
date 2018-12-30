@@ -94,13 +94,13 @@ class UNet(nn.Module):
         
         self.seg = nn.Conv2d(64,n_class,1,padding=pad)
         
-        #self._init_weights()
-        self._initialize_weights()
+        self._init_weights()
+        #self._initialize_weights()
     
     def _init_weights(self):
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
-                nn.init.kaiming_normal_(m, nonlinearity='relu')
+                nn.init.kaiming_normal_(m.weight, nonlinearity='relu')
                 #nn.init.xavier_uniform(conv1.weight)
 
     def _initialize_weights(self):
