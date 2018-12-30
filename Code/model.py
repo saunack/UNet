@@ -13,39 +13,39 @@ class UNet(nn.Module):
         #DOWNSAMPLING
         #conv1
         self.dconv1_1 = nn.Conv2d(1,64,3,padding=pad)
-        self.drelu1_1 = nn.ReLU(inplace=True)
+        self.drelu1_1 = nn.ReLU()
         self.dconv1_2 = nn.Conv2d(64,64,3,padding=pad)
-        self.drelu1_2 = nn.ReLU(inplace=True)
-        self.dpool1 = nn.MaxPool2d(2,stride=2,ceil_mode=True)  #1/2
+        self.drelu1_2 = nn.ReLU()
+        self.dpool1 = nn.MaxPool2d(2,stride=2)  #1/2
         
         #conv2
         self.dconv2_1 = nn.Conv2d(64,128,3,padding=pad)
-        self.drelu2_1 = nn.ReLU(inplace=True)
+        self.drelu2_1 = nn.ReLU()
         self.dconv2_2 = nn.Conv2d(128,128,3,padding=pad)
-        self.drelu2_2 = nn.ReLU(inplace=True)
-        self.dpool2 = nn.MaxPool2d(2,stride=2,ceil_mode=True)  #1/4
+        self.drelu2_2 = nn.ReLU()
+        self.dpool2 = nn.MaxPool2d(2,stride=2)  #1/4
         
         #conv3
         self.dconv3_1 = nn.Conv2d(128,256,3,padding=pad)
-        self.drelu3_1 = nn.ReLU(inplace=True)
+        self.drelu3_1 = nn.ReLU()
         self.dconv3_2 = nn.Conv2d(256,256,3,padding=pad)
-        self.drelu3_2 = nn.ReLU(inplace=True)
-        self.dpool3 = nn.MaxPool2d(2,stride=2,ceil_mode=True)  #1/8
+        self.drelu3_2 = nn.ReLU()
+        self.dpool3 = nn.MaxPool2d(2,stride=2)  #1/8
         self.ddrop3 = nn.Dropout2d(p=0.2)
         
         #conv4
         self.dconv4_1 = nn.Conv2d(256,512,3,padding=pad)
-        self.drelu4_1 = nn.ReLU(inplace=True)
+        self.drelu4_1 = nn.ReLU()
         self.dconv4_2 = nn.Conv2d(512,512,3,padding=pad)
-        self.drelu4_2 = nn.ReLU(inplace=True)
-        self.dpool4 = nn.MaxPool2d(2,stride=2,ceil_mode=True)  #1/8
+        self.drelu4_2 = nn.ReLU()
+        self.dpool4 = nn.MaxPool2d(2,stride=2)  #1/8
         self.ddrop4 = nn.Dropout2d(p=0.2)
         
         #BOTTLENECK
         self.bconv1_1 = nn.Conv2d(512,1024,3,padding=pad)
-        self.brelu1_1 = nn.ReLU(inplace=True)
+        self.brelu1_1 = nn.ReLU()
         self.bconv1_2 = nn.Conv2d(1024,1024,3,padding=pad)
-        self.brelu1_2 = nn.ReLU(inplace=True)
+        self.brelu1_2 = nn.ReLU()
         
         #UPSAMPLING
         #conv1
@@ -54,9 +54,9 @@ class UNet(nn.Module):
         else:
             self.upool1 = nn.ConvTranspose2d(1024,512,2,stride=2)
         self.uconv1_1 = nn.Conv2d(1024,512,3,padding=pad)
-        self.urelu1_1 = nn.ReLU(inplace=True)
+        self.urelu1_1 = nn.ReLU()
         self.uconv1_2 = nn.Conv2d(512,512,3,padding=pad)
-        self.urelu1_2 = nn.ReLU(inplace=True)
+        self.urelu1_2 = nn.ReLU()
         self.udrop1 = nn.Dropout2d(p=0.2)
         
         #conv2
@@ -65,9 +65,9 @@ class UNet(nn.Module):
         else:
             self.upool2 = nn.ConvTranspose2d(512,256,2,stride=2)
         self.uconv2_1 = nn.Conv2d(512,256,3,padding=pad)
-        self.urelu2_1 = nn.ReLU(inplace=True)
+        self.urelu2_1 = nn.ReLU()
         self.uconv2_2 = nn.Conv2d(256,256,3,padding=pad)
-        self.urelu2_2 = nn.ReLU(inplace=True)
+        self.urelu2_2 = nn.ReLU()
         self.udrop2 = nn.Dropout2d(p=0.2)
         
         #conv3
@@ -76,9 +76,9 @@ class UNet(nn.Module):
         else:
             self.upool3 = nn.ConvTranspose2d(256,128,2,stride=2)
         self.uconv3_1 = nn.Conv2d(256,128,3,padding=pad)
-        self.urelu3_1 = nn.ReLU(inplace=True)
+        self.urelu3_1 = nn.ReLU()
         self.uconv3_2 = nn.Conv2d(128,128,3,padding=pad)
-        self.urelu3_2 = nn.ReLU(inplace=True)
+        self.urelu3_2 = nn.ReLU()
         self.udrop3 = nn.Dropout2d(p=0.2)
         
         #conv4
@@ -87,9 +87,9 @@ class UNet(nn.Module):
         else:
             self.upool4 = nn.ConvTranspose2d(128,64,2,stride=2)
         self.uconv4_1 = nn.Conv2d(128,64,3,padding=pad)
-        self.urelu4_1 = nn.ReLU(inplace=True)
+        self.urelu4_1 = nn.ReLU()
         self.uconv4_2 = nn.Conv2d(64,64,3,padding=pad)
-        self.urelu4_2 = nn.ReLU(inplace=True)
+        self.urelu4_2 = nn.ReLU()
         self.udrop4 = nn.Dropout2d(p=0.2)
         
         self.seg = nn.Conv2d(64,n_class,1,padding=pad)
@@ -138,13 +138,13 @@ class UNet(nn.Module):
         h = self.drelu3_1(self.dconv3_1(h))
         h = self.drelu3_2(self.dconv3_2(h))
         cc3 = h
-        h = self.ddrop3(h)
+        #h = self.ddrop3(h)
         h = self.dpool3(h)
         
         h = self.drelu4_1(self.dconv4_1(h))
         h = self.drelu4_2(self.dconv4_2(h))
         cc4 = h
-        h = self.ddrop4(h)
+        #h = self.ddrop4(h)
         h = self.dpool4(h)
         
         #BOTTLENECK
@@ -154,25 +154,25 @@ class UNet(nn.Module):
         #UPSAMPLING
         h = self.upool1(h)
         h = self.concat(h,cc4)
-        h = self.udrop1(h)
+        #h = self.udrop1(h)
         h = self.urelu1_1(self.uconv1_1(h))
         h = self.urelu1_2(self.uconv1_2(h))
         
         h = self.upool2(h)
         h = self.concat(h,cc3)
-        h = self.udrop2(h)
+        #h = self.udrop2(h)
         h = self.urelu2_1(self.uconv2_1(h))
         h = self.urelu2_2(self.uconv2_2(h))
         
         h = self.upool3(h)
         h = self.concat(h,cc2)
-        h = self.udrop3(h)
+        #h = self.udrop3(h)
         h = self.urelu3_1(self.uconv3_1(h))
         h = self.urelu3_2(self.uconv3_2(h))
         
         h = self.upool4(h)
         h = self.concat(h,cc1)
-        h = self.udrop4(h)
+        #h = self.udrop4(h)
         h = self.urelu4_1(self.uconv4_1(h))
         h = self.urelu4_2(self.uconv4_2(h))
         
