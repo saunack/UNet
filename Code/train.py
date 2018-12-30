@@ -14,7 +14,7 @@ def get_options():
     parser.add_argument("-m","--momentum",type=float,dest="momentum",help="learning momentum",default=0.9)
 
     args = parser.parse_args()
-    train(args.epochs, args.lr, args.momentum)
+    train(args.epochs, args.lr, args.momentum, args.decay)
 
 def train(epochs, lr, momentum, decay):
     dataset = Segmentation(transform = Compose([ \
