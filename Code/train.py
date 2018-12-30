@@ -43,9 +43,10 @@ def train(epochs = 2):
             
             optimizer.step()
 
-            print("Epoch #{} Batch #{} Loss: {}".format(epoch,i,loss.item()))
+            if i % 10 == 0 :
+                print("Epoch #{} Batch #{} Loss: {}".format(epoch,i,loss.item()))
         
         print("Epoch",epoch," finished. Loss :",loss)
         epoch_loss = 0
         
-train(6)
+train(60)
