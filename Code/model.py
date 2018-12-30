@@ -125,6 +125,7 @@ class UNet(nn.Module):
     def forward(self, x):
         h = x
         #DOWNSAMPLING
+        return nn.Conv2d(1,2,3,padding=0)(h)
         h = self.drelu1_1(self.dconv1_1(h))
         h = self.drelu1_2(self.dconv1_2(h))
         cc1 = h
