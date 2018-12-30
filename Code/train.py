@@ -8,9 +8,9 @@ from dataset import Segmentation, RandomAffine, Pad, RandomFlip, CenterCrop, ToT
 def train(epochs = 2):
     dataset = Segmentation(transform = Compose([ \
       Pad(120, mode='symmetric'), \
-      RandomAffine((0, 90), (31, 31)), \
-			RandomFlip(), \
-			RandomWarp(),
+      #RandomAffine((0, 90), (31, 31)), \
+			#RandomFlip(), \
+			#RandomWarp(),
 			CenterCrop(572, 388), \
 			ToTensor()
     ]))
