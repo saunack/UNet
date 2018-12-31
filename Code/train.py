@@ -17,7 +17,7 @@ dataset = Segmentation(transform = Compose([ \
 	CenterCrop(572, 388), \
 	ToTensor()
 ]))
-model = UNet(n_class = 2).cuda() if torch.cuda.is_available() else UNet(n_class = 2)
+model = UNet(n_class = 1).cuda() if torch.cuda.is_available() else UNet(n_class = 1)
 
 def get_options():
     parser = argparse.ArgumentParser()
@@ -37,11 +37,12 @@ def get_options():
       T.ToPILImage()(torch.argmax(model(img.unsqueeze(0))[0],0).float().unsqueeze(0)).show()
 
 def train(epochs, lr, momentum, decay, display):
-    optimizer = torch.optim.SGD(model.parameters(), lr = lr, momentum = momentum, weight_decay = decay)
+    #optimizer = torch.optim.SGD(model.parameters(), lr = lr, momentum = momentum, weight_decay = decay)
+    optimizer = torch.Adam(model.parameters(), lr = 0.0001)
     loss_log = []
     # criterion = torch.nn.CrossEntropyLoss(reduction='sum')
     weight = torch.Tensor([0.2193145751953125, 0.7806854248046875])
-    criterion = torch.nn.CrossEntropyLoss(reduction='mean')
+    criterion = torch.nn.BCELoss(reduction='mean')
     for epoch in range(epochs):
         #print("Starting Epoch #{}".format(epoch))
 
@@ -59,14 +60,9 @@ def train(epochs, lr, momentum, decay, display):
             outputs = model.forward(image).cuda() if torch.cuda.is_available() else model.forward(image)
             
             if display:
-              #display max index for every pixel
-              T.ToPILImage()((outputs[0][0]>outputs[0][1]).float().unsqueeze(0)).show()
-              #display both channels side by side
-              Image.fromarray(np.hstack((np.array(T.ToPILImage()(outputs[0][0].float().unsqueeze(0))),np.array(T.ToPILImage()(outputs[0][1].float().unsqueeze(0)))))).show()
-              #T.ToPILImage()(outputs[0][0].float().unsqueeze(0)).show()
-              #T.ToPILImage()(outputs[0][1].float().unsqueeze(0)).show()
+              T.ToPILImage()(outputs[0].float()).show()
 
-            loss = criterion(outputs, label)
+            loss = criterion(outputs.float(), label.float().unsqueeze(0))
             loss.backward()
             
             epoch_loss = epoch_loss + loss.item()
