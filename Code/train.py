@@ -3,7 +3,7 @@ import torch
 from torch.utils.data import DataLoader
 from torch.nn import functional as F
 from torchvision.transforms import Compose
-from model import UNet
+from modeler import UNet
 from dataset import Segmentation, RandomAffine, Pad, RandomFlip, CenterCrop, ToTensor, RandomWarp
 
 def get_options():
@@ -53,11 +53,12 @@ def train(epochs, lr, momentum, decay):
             
             optimizer.step()
 
-            if i % 10 == 0 :
-                print("Epoch #{} Batch #{} Loss: {}".format(epoch,i,loss.item()))
+            #if i % 10 == 0 :
+                #print("Epoch #{} Batch #{} Loss: {}".format(epoch,i,loss.item()))
         loss_log.append(epoch_loss)
         
         #print("Epoch",epoch," finished. Loss :",loss.item())
+        print(epoch,loss.item())
         epoch_loss = 0
     print(loss_log)
 
