@@ -157,8 +157,8 @@ class Segmentation(Dataset):
 		return 1
 	
 	def __getitem__(self, idx):
-		#self.images.seek(idx)
-		#self.annotations.seek(idx)
+		self.images.seek(idx)
+		self.annotations.seek(idx)
 
 		#sample = (torchvision.transforms.ToTensor()(self.images)[0],
 			#torchvision.transforms.ToTensor()(self.annotations)[0])
