@@ -12,7 +12,7 @@ class Conv(nn.Module):
 			nn.ReLU()
 		)
 
-		# self._init_weights()
+		self._init_weights()
 	
 	def _init_weights(self):
 		for m in self.modules():
