@@ -38,7 +38,7 @@ def get_options():
 
 def train(epochs, lr, momentum, decay, display):
     #optimizer = torch.optim.SGD(model.parameters(), lr = lr, momentum = momentum, weight_decay = decay)
-    optimizer = torch.Adam(model.parameters(), lr = 0.0001)
+    optimizer = torch.optim.Adam(model.parameters(), lr = 0.0001)
     loss_log = []
     # criterion = torch.nn.CrossEntropyLoss(reduction='sum')
     weight = torch.Tensor([0.2193145751953125, 0.7806854248046875])
