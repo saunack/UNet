@@ -9,6 +9,7 @@ from dataset import Segmentation, RandomAffine, Pad, RandomFlip, CenterCrop, ToT
 from torchvision import transforms as T
 from PIL import Image
 import numpy as np
+
 dataset = Segmentation(transform = Compose([ \
   Pad(120, mode='symmetric'), \
   RandomAffine((0, 90), (31, 31)), \
@@ -17,6 +18,8 @@ dataset = Segmentation(transform = Compose([ \
 	CenterCrop(572, 388), \
 	ToTensor()
 ]))
+model = UNet(n_class = 1).cuda() if torch.cuda.is_available() else UNet(n_class = 1)
+
 save_model = False
 load_model = False
 
@@ -25,8 +28,9 @@ def save_checkpoint(checkpt, filename):
 
 def get_checkpoint(model, optimizer, loss):
     filename = "unet.pth"
+    map_location = 'cuda:0' if torch.cuda.is_available() else 'cpu'
     if os.path.isfile(filename):
-      checkpoint = torch.load(filename)
+      checkpoint = torch.load(filename, map_location=map_location)
       model.load_state_dict(checkpoint['state_dict'])
       optimizer.load_state_dict(checkpoint['optimizer'])
       loss.append(checkpoint['loss_log'][0])
@@ -52,13 +56,12 @@ def get_options():
       img, seg = dataset[0]['image'], dataset[0]['segmented']
       T.ToPILImage()(img).show()
       T.ToPILImage()(seg.unsqueeze(0).float()).show()
-      #T.ToPILImage()(torch.argmax(model(img.unsqueeze(0))[0],0).float().unsqueeze(0)).show()
+      T.ToPILImage()((model(img.unsqueeze(0))[0]).float()).show()
 
 #def train(epochs, lr, momentum, decay, display):
 def train(epochs, lr, display):
     #optimizer = torch.optim.SGD(model.parameters(), lr = lr, momentum = momentum, weight_decay = decay)
     weight = torch.Tensor([0.2193145751953125, 0.7806854248046875])
-    model = UNet(n_class = 1).cuda() if torch.cuda.is_available() else UNet(n_class = 1)
     optimizer = torch.optim.Adam(model.parameters(),lr = 0.0001)
     loss_log = []
     if load_model:
