@@ -11,7 +11,7 @@ from PIL import Image
 import numpy as np
 
 dataset = Segmentation(transform = Compose([ \
-  Pad(120, mode='symmetric'), \
+  Pad(150, mode='symmetric'), \
   RandomAffine((0, 90), (31, 31)), \
 	RandomFlip(), \
 	RandomWarp(),
@@ -51,12 +51,6 @@ def get_options():
     load_model = args.load
     #train(args.epochs, args.lr, args.momentum, args.decay, args.display)
     train(args.epochs, args.lr, args.display)
-
-    if args.display:
-      img, seg = dataset[0]['image'], dataset[0]['segmented']
-      T.ToPILImage()(img).show()
-      T.ToPILImage()(seg.unsqueeze(0).float()).show()
-      T.ToPILImage()((model(img.unsqueeze(0))[0]).float()).show()
 
 #def train(epochs, lr, momentum, decay, display):
 def train(epochs, lr, display):
@@ -107,5 +101,23 @@ def train(epochs, lr, display):
 													},"unet.pth")
     print(loss_log)
     #T.ToPILImage()(outputs[0].float()).show()
+
+    if display:
+      testloader = DataLoader(dataset=dataset, batch_size=1, shuffle=True)
+      dataiter = iter(testloader)
+
+      testimg = dataiter.next()
+      img, seg = testimg['image'], testimg['segmented']
+      trained = model(img)
+      thresholded = (trained > torch.tensor([0.5]))
+      T.ToPILImage()(img[0]).show()
+      T.ToPILImage()(seg.float()).show()
+      T.ToPILImage()((trained[0]).float()).show()
+      T.ToPILImage()((thresholded[0]).float()).show()
+
+      matching = (thresholded[0].long() == seg.long()).sum()
+      accuracy = float(matching) / seg.numel()
+      print("matching {}, total {}, accuracy {}".format(matching, seg.numel(),\
+        accuracy))
 
 get_options()
