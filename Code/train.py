@@ -3,7 +3,7 @@ import torch
 from torch.utils.data import DataLoader
 from torch.nn import functional as F
 from torchvision.transforms import Compose
-from modeler import UNet
+from model import UNet
 from dataset import Segmentation, RandomAffine, Pad, RandomFlip, CenterCrop, ToTensor, RandomWarp
 
 from torchvision import transforms as T
@@ -12,10 +12,11 @@ import numpy as np
 
 dataset = Segmentation(transform = Compose([ \
   Pad(150, mode='symmetric'), \
-  RandomAffine((0, 90), (31, 31)), \
+  RandomAffine((0, 90), (30, 30)), \
+	CenterCrop(512, 512), \
 	RandomFlip(), \
 	RandomWarp(),
-	CenterCrop(572, 388), \
+	CenterCrop(512, 504), \
 	ToTensor()
 ]))
 model = UNet(n_class = 1).cuda() if torch.cuda.is_available() else UNet(n_class = 1)
@@ -55,7 +56,6 @@ def get_options():
 #def train(epochs, lr, momentum, decay, display):
 def train(epochs, lr, display):
     #optimizer = torch.optim.SGD(model.parameters(), lr = lr, momentum = momentum, weight_decay = decay)
-    weight = torch.Tensor([0.2193145751953125, 0.7806854248046875])
     optimizer = torch.optim.Adam(model.parameters(),lr = 0.0001)
     loss_log = []
     if load_model:
@@ -76,7 +76,7 @@ def train(epochs, lr, display):
             
             ## Run the forward pass
             outputs = model.forward(image).cuda() if torch.cuda.is_available() else model.forward(image)
-            
+         
             if display:
               T.ToPILImage()(outputs[0].float()).show()
 
@@ -87,8 +87,8 @@ def train(epochs, lr, display):
             
             optimizer.step()
 
-            #if i % 10 == 0 :
-                #print("Epoch #{} Batch #{} Loss: {}".format(epoch,i,loss.item()))
+            if i % 10 == 0 :
+                print("Epoch #{} Batch #{} Loss: {}".format(epoch,i,loss.item()))
         loss_log.append(epoch_loss)
         
         #print("Epoch",epoch," finished. Loss :",loss.item())

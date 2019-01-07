@@ -60,7 +60,7 @@ class CenterCrop(object):
 	def __call__(self, sample):
 		img = F.center_crop(sample['image'], self.img_size)
 		seg = F.center_crop(sample['segmented'], self.seg_size)
-
+	
 		return {'image': img, 'segmented': seg}
 
 class RandomFlip(object):
