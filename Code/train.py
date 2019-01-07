@@ -69,7 +69,7 @@ def train(epochs, lr, display):
 
         for i,images in enumerate(train_loader):
             # get the inputs
-            image, label = images['image'], images['segmented']
+            image, label = images['image'], images['label']
             
             # zero the parameter gradients
             optimizer.zero_grad()
@@ -107,17 +107,17 @@ def train(epochs, lr, display):
       dataiter = iter(testloader)
 
       testimg = dataiter.next()
-      img, seg = testimg['image'], testimg['segmented']
+      img, lbl = testimg['image'], testimg['label']
       trained = model(img)
       thresholded = (trained > torch.tensor([0.5]))
       T.ToPILImage()(img[0]).show()
-      T.ToPILImage()(seg.float()).show()
+      T.ToPILImage()(lbl.float()).show()
       T.ToPILImage()((trained[0]).float()).show()
       T.ToPILImage()((thresholded[0]).float()).show()
 
-      matching = (thresholded[0].long() == seg.long()).sum()
-      accuracy = float(matching) / seg.numel()
-      print("matching {}, total {}, accuracy {}".format(matching, seg.numel(),\
+      matching = (thresholded[0].long() == lbl.long()).sum()
+      accuracy = float(matching) / lbl.numel()
+      print("matching {}, total {}, accuracy {}".format(matching, lbl.numel(),\
         accuracy))
 
 get_options()

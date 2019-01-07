@@ -12,9 +12,9 @@ class ToTensor(object):
 
 	def __call__(self, sample):
 		img = F.to_tensor(sample['image'])
-		seg = F.to_tensor(sample['segmented'])
+		lbl = F.to_tensor(sample['label'])
 
-		return {'image': img, 'segmented': seg}
+		return {'image': img, 'label': lbl}
 
 class RandomWarp(object):
 	""" Randomly apply elastic deformation to PIL Image """
@@ -32,18 +32,18 @@ class RandomWarp(object):
 		self.kernel_dim = kernel_dim
 
 	def __call__(self, sample):
-		img, seg = sample['image'], sample['segmented']
+		img, lbl = sample['image'], sample['label']
 		
 		if random.random() < self.p:
 			grid = deform_grid(self.kernel_dim, self.sigma, \
 				self.alpha, img.size[0])
 			img = torch.nn.functional.grid_sample(T.ToTensor()\
 				(img).unsqueeze(0), grid)
-			seg = torch.nn.functional.grid_sample(T.ToTensor()\
-				(seg).unsqueeze(0), grid)
+			lbl = torch.nn.functional.grid_sample(T.ToTensor()\
+				(lbl).unsqueeze(0), grid)
 
-		return {'image': T.ToPILImage()(img[0]), 'segmented':\
-			T.ToPILImage()(seg[0])}
+		return {'image': T.ToPILImage()(img[0]), 'label':\
+			T.ToPILImage()(lbl[0])}
 
 class CenterCrop(object):
 	""" Crop given image in sample """
@@ -53,15 +53,15 @@ class CenterCrop(object):
 		size (int): size of cropped image
 	"""
 
-	def __init__(self, img_size, seg_size):
+	def __init__(self, img_size, lbl_size):
 		self.img_size = img_size
-		self.seg_size = seg_size
+		self.lbl_size = lbl_size
 	
 	def __call__(self, sample):
 		img = F.center_crop(sample['image'], self.img_size)
-		seg = F.center_crop(sample['segmented'], self.seg_size)
+		lbl = F.center_crop(sample['label'], self.lbl_size)
 	
-		return {'image': img, 'segmented': seg}
+		return {'image': img, 'label': lbl}
 
 class RandomFlip(object):
 	""" Randomly flip given image in sample """
@@ -78,19 +78,19 @@ class RandomFlip(object):
 			self.p = (p, p)
 	
 	def __call__(self, sample):
-		img, seg = sample['image'], sample['segmented']
+		img, lbl = sample['image'], sample['label']
 
 		if random.random() < self.p[0]:
 			# print("Horizontal flip")
 			img = F.hflip(img)
-			seg = F.hflip(seg)
+			lbl = F.hflip(lbl)
 
 		if random.random() < self.p[1]:
 			# print("Vertical flip")
 			img = F.vflip(img)
-			seg = F.vflip(seg)
+			lbl = F.vflip(lbl)
 
-		return {'image': img, 'segmented': seg}
+		return {'image': img, 'label': lbl}
 
 class Pad(object):
 	""" Pad given image in sample """
@@ -108,10 +108,10 @@ class Pad(object):
 	
 	def __call__(self, sample):
 		img = F.pad(sample['image'], self.padding, padding_mode=self.mode)
-		seg = F.pad(sample['segmented'], self.padding, padding_mode=self.mode)
+		lbl = F.pad(sample['label'], self.padding, padding_mode=self.mode)
 		# print("Padding - size {}, mode {}".format(self.padding, self.mode))
 
-		return {'image': img, 'segmented': seg}
+		return {'image': img, 'label': lbl}
 
 class RandomAffine(object):
 	""" Randomly rotate and translate the image in sample """
@@ -133,9 +133,9 @@ class RandomAffine(object):
 		# print("Affine - rotate {} degrees, translate ({}, {})".format(degrees, translate[0], translate[1]))
 		
 		img = F.affine(sample['image'], degrees, translate, 1, 0)
-		seg = F.affine(sample['segmented'], degrees, translate, 1, 0)
+		lbl = F.affine(sample['label'], degrees, translate, 1, 0)
 
-		return {'image': img, 'segmented': seg}
+		return {'image': img, 'label': lbl}
 
 class Segmentation(Dataset):
 	""" Segmentation dataset """
@@ -143,29 +143,23 @@ class Segmentation(Dataset):
 	def __init__(self,transform = None):
 		"""
 		Args:
-			annotations (string): Path to segmented labels (format 'tiff')
-			images (string): Path to image files (format 'tiff')
+			labels (string): Path to directory with label files (format 'png')
+			images (string): Path to directory image files (format 'png')
 			transform (callable, optional): Optional transform to be applied
 				on a sample
 		"""
 
-		self.images = Image.open('../Data/train-volume.tif')
-		self.annotations = Image.open('../Data/train-labels.tif')
+		self.image_path = '../Data/train/images/'
+		self.label_path = '../Data/train/labels/'
 		self.transform = transform
 	
 	def __len__(self):
 		return 30
 	
 	def __getitem__(self, idx):
-		self.images.seek(idx)
-		self.annotations.seek(idx)
-
-		#sample = (torchvision.transforms.ToTensor()(self.images)[0],
-			#torchvision.transforms.ToTensor()(self.annotations)[0])
-
 		sample = {
-			'image': self.images,
-			'segmented': self.annotations
+			'image': Image.open(self.image_path + str(idx) + '.png'),
+			'label': Image.open(self.label_path + str(idx) + '.png')
 		}
         
 		if self.transform:
@@ -173,9 +167,9 @@ class Segmentation(Dataset):
 		
 		if torch.cuda.is_available():
 			sample['image'] = sample['image'].cuda()
-			sample['segmented'] = sample['segmented'].cuda()
+			sample['label'] = sample['label'].cuda()
 
-		sample['segmented'] = sample['segmented'][0].long()
+		sample['label'] = sample['label'][0].long()
 		return sample
 	
 	def get_images(self):
