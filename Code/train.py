@@ -1,4 +1,4 @@
-import argparse, os
+import os
 import torch
 from torch.utils.data import DataLoader
 from torch.nn import functional as F
@@ -10,6 +10,7 @@ from torchvision import transforms as T
 from PIL import Image
 import numpy as np
 
+# Dataset
 dataset = Segmentation(transform = Compose([ \
   Pad(150, mode='symmetric'), \
   RandomAffine((0, 90), (30, 30)), \
@@ -19,10 +20,9 @@ dataset = Segmentation(transform = Compose([ \
 	CenterCrop(512, 504), \
 	ToTensor()
 ]))
-model = UNet(n_class = 1).cuda() if torch.cuda.is_available() else UNet(n_class = 1)
 
-save_model = False
-load_model = False
+# Neural network
+model = UNet(n_class = 1).cuda() if torch.cuda.is_available() else UNet(n_class = 1)
 
 def save_checkpoint(checkpt, filename):
     torch.save(checkpt,filename)
@@ -36,31 +36,17 @@ def get_checkpoint(model, optimizer, loss):
       optimizer.load_state_dict(checkpoint['optimizer'])
       loss.append(checkpoint['loss_log'][0])
 
-def get_options():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-e","--epochs",type=int,dest="epochs",help="number of epochs",default=100)
-    parser.add_argument("-lr",type=float,dest="lr",help="learning rate",default=0.001)
-    #parser.add_argument("-d","--decay",type=float,dest="decay",help="weight decay",default=0.005)
-    #parser.add_argument("-m","--momentum",type=float,dest="momentum",help="learning momentum",default=0.9)
-    parser.add_argument("--display", action = 'store_true')
-    parser.add_argument("--save", action = 'store_true')
-    parser.add_argument("--load", action = 'store_true')
-    args = parser.parse_args()
-    global save_model
-    global load_model
-    save_model = args.save
-    load_model = args.load
-    #train(args.epochs, args.lr, args.momentum, args.decay, args.display)
-    train(args.epochs, args.lr, args.display)
-
 #def train(epochs, lr, momentum, decay, display):
-def train(epochs, lr, display):
+def train(epochs=10, lr=0.001, display=False, save=False, load=False):
     #optimizer = torch.optim.SGD(model.parameters(), lr = lr, momentum = momentum, weight_decay = decay)
     optimizer = torch.optim.Adam(model.parameters(),lr = 0.0001)
     loss_log = []
-    if load_model:
+
+    if load:
         get_checkpoint(model, optimizer, loss_log)
+
     criterion = torch.nn.BCELoss(reduction='mean')
+
     for epoch in range(epochs):
         #print("Starting Epoch #{}".format(epoch))
 
@@ -94,7 +80,7 @@ def train(epochs, lr, display):
         #print("Epoch",epoch," finished. Loss :",loss.item())
         print(epoch,loss.item())
         epoch_loss = 0
-    if save_model:
+    if save:
         save_checkpoint({'state_dict':model.state_dict(),
 				                  'optimizer':optimizer.state_dict(),
 													'loss_log':loss_log,
@@ -119,5 +105,3 @@ def train(epochs, lr, display):
       accuracy = float(matching) / lbl.numel()
       print("matching {}, total {}, accuracy {}".format(matching, lbl.numel(),\
         accuracy))
-
-get_options()
