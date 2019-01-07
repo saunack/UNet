@@ -75,7 +75,7 @@ class UNet(nn.Module):
 			nn.Conv2d(64,n_class,1,padding=padding),\
 			nn.ReLU(),\
 			nn.Conv2d(n_class,n_class,1,padding=padding),\
-			nn.Sigmoid()\
+			nn.Tanh()\
 		)
 
 		# self._init_weights()
