@@ -4,7 +4,7 @@ from torchvision import transforms as T
 from torchvision.transforms import functional as F
 from PIL import Image
 from torch.utils.data import Dataset, DataLoader
-from dd import deform_grid
+from deform import deform_grid
 import numpy as np
 
 class ToTensor(object):
