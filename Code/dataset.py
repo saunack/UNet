@@ -158,8 +158,8 @@ class Segmentation(Dataset):
 	
 	def __getitem__(self, idx):
 		sample = {
-			'image': Image.open(self.image_path + str(idx) + '.png'),
-			'label': Image.open(self.label_path + str(idx) + '.png')
+			'image': Image.open(self.image_path + str(idx+1) + '.png'),
+			'label': Image.open(self.label_path + str(idx+1) + '.png')
 		}
         
 		if self.transform:
