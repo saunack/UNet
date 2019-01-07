@@ -1,4 +1,5 @@
 import argparse
+from train import train
 
 def get_options():
     parser = argparse.ArgumentParser()
