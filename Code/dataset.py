@@ -174,3 +174,39 @@ class Segmentation(Dataset):
 	
 	def get_images(self):
 		return self.images
+
+class Test_image(Dataset):
+	""" Segmentation dataset """
+
+	def __init__(self,transform = None):
+		"""
+		Args:
+			labels (string): Path to directory with label files (format 'png')
+			images (string): Path to directory image files (format 'png')
+			transform (callable, optional): Optional transform to be applied
+				on a sample
+		"""
+
+		self.image_path = '../Data/test/images/'
+		self.transform = transform
+	
+	def __len__(self):
+		return 30
+	
+	def __getitem__(self, idx):
+		sample = {
+			'image': Image.open(self.image_path + str(idx+1) + '.png'),
+			'label': Image.open(self.image_path + str(idx+1) + '.png'),		#should not be present, but all the transfomations require an element 'label'
+		}
+        
+		if self.transform:
+			sample = self.transform(sample)
+		
+		if torch.cuda.is_available():
+			sample['image'] = sample['image'].cuda()
+			sample['label'] = sample['label'].cuda()
+
+		return sample
+	
+	def get_images(self):
+		return self.images
