@@ -73,9 +73,7 @@ class UNet(nn.Module):
 		# 1x1 2D Convolution filter from 64 channels to n_channels
 		self.reduce = nn.Sequential(\
 			nn.Conv2d(64,n_class,1,padding=padding),\
-			nn.ReLU(),\
-			nn.Conv2d(n_class,n_class,1,padding=padding),\
-			nn.Tanh()\
+			nn.Softmax(dim=0),\
 		)
 
 		# self._init_weights()

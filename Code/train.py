@@ -22,7 +22,7 @@ dataset = Segmentation(transform = Compose([ \
 ]))
 
 # Neural network
-model = UNet(n_class = 1).cuda() if torch.cuda.is_available() else UNet(n_class = 1)
+model = UNet(n_class = 2).cuda() if torch.cuda.is_available() else UNet(n_class = 2)
 
 def save_checkpoint(checkpt, filename):
     torch.save(checkpt,filename)
@@ -45,7 +45,7 @@ def train(epochs=10, lr=0.001, display=False, save=False, load=False):
     if load:
         get_checkpoint(model, optimizer, loss_log)
 
-    criterion = torch.nn.BCELoss(reduction='mean')
+    criterion = torch.nn.CrossEntropyLoss(reduction='mean')
 
     for epoch in range(epochs):
         #print("Starting Epoch #{}".format(epoch))
@@ -63,10 +63,7 @@ def train(epochs=10, lr=0.001, display=False, save=False, load=False):
             ## Run the forward pass
             outputs = model.forward(image).cuda() if torch.cuda.is_available() else model.forward(image)
          
-            if display:
-              T.ToPILImage()(outputs[0].float()).show()
-
-            loss = criterion(outputs.float(), label.float().unsqueeze(0))
+            loss = criterion(outputs.float(), label)
             loss.backward()
             
             epoch_loss = epoch_loss + loss.item()
@@ -95,13 +92,13 @@ def train(epochs=10, lr=0.001, display=False, save=False, load=False):
       testimg = dataiter.next()
       img, lbl = testimg['image'], testimg['label']
       trained = model(img)
-      thresholded = (trained > torch.tensor([0.5]))
       T.ToPILImage()(img[0]).show()
       T.ToPILImage()(lbl.float()).show()
-      T.ToPILImage()((trained[0]).float()).show()
-      T.ToPILImage()((thresholded[0]).float()).show()
+      T.ToPILImage()((trained[0][0]).unsqueeze(0).float()).show()
+      T.ToPILImage()((trained[0][1]).unsqueeze(0).float()).show()
+      T.ToPILImage()((torch.argmax(trained[0],dim=0)).unsqueeze(0).float()).show()
 
-      matching = (thresholded[0].long() == lbl.long()).sum()
-      accuracy = float(matching) / lbl.numel()
-      print("matching {}, total {}, accuracy {}".format(matching, lbl.numel(),\
-        accuracy))
+      #matching = (thresholded[0].long() == lbl.long()).sum()
+      #accuracy = float(matching) / lbl.numel()
+      #print("matching {}, total {}, accuracy {}".format(matching, lbl.numel(),\
+      #  accuracy))
