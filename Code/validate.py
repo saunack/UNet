@@ -71,11 +71,14 @@ def validate(display=False):
 			accuracy = float(matching) / lbl.numel()
 			print("matching {}, total {}, accuracy {}".format(matching, lbl.numel(), accuracy))
 			try:
-				precision = float(TP/(TP+FP))
-				recall = float(TP/(TP+FN))
+				precision = float(TP.float()/(TP.float()+FP.float()))
+				recall = float(TP.float()/(TP.float()+FN.float()))
 				F1 = float(2*precision*recall/(precision + recall))
 				print("\taccuracy {}, precision {}, F1 score{}".format(accuracy, precision, F1))
 			except FloatingPointError:
+				continue
+			except ZeroDivisionError:
+				print(TP,TN,FP,FN)
 				continue
 		except StopIteration:
 			break
