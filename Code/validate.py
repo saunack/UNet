@@ -63,9 +63,19 @@ def validate(display=False):
 				T.ToPILImage()((trained[0]).float()).show()
 				T.ToPILImage()((thresholded[0]).float()).show()
 
+			TP = ((thresholded[0].long() == lbl.long()) & (thresholded[0].long() == 1)).sum()
+			TN = ((thresholded[0].long() == lbl.long()) & (thresholded[0].long() == 0)).sum()
+			FP = ((thresholded[0].long() != lbl.long()) & (thresholded[0].long() == 1)).sum()
+			FN = ((thresholded[0].long() != lbl.long()) & (thresholded[0].long() == 0)).sum()
 			matching = (thresholded[0].long() == lbl.long()).sum()
 			accuracy = float(matching) / lbl.numel()
-			print("matching {}, total {}, accuracy {}".format(matching, lbl.numel(),\
-			accuracy))
+			print("matching {}, total {}, accuracy {}".format(matching, lbl.numel(), accuracy))
+			try:
+				precision = float(TP/(TP+FP))
+				recall = float(TP/(TP+FN))
+				F1 = float(2*precision*recall/(precision + recall))
+				print("\taccuracy {}, precision {}, F1 score{}".format(accuracy, precision, F1))
+			except FloatingPointError:
+				continue
 		except StopIteration:
 			break
