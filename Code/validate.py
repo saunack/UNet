@@ -55,7 +55,7 @@ def validate(display=False):
 			testimg = dataiter.next()
 			img, lbl = testimg['image'], testimg['label']
 			trained = model(img)
-			thresholded = (trained > torch.tensor([0.5]))
+			thresholded = (trained > torch.tensor([0.6]))
 			if display:
 				T.ToPILImage()(img[0]).show()
 				T.ToPILImage()(lbl.float()).show()
