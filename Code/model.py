@@ -61,14 +61,12 @@ class UNet(nn.Module):
 		self.dconv1 = Conv(1,64,padding)
 		self.dconv2 = down(64,128,padding)
 		self.dconv3 = down(128,256,padding)
-		self.dconv4 = down(256,512,padding)
 		
-		self.bconv = down(512,1024,padding)
+		self.bconv = down(256,512,padding)
 
-		self.uconv1 = up(1024,512,padding)
-		self.uconv2 = up(512,256,padding)
-		self.uconv3 = up(256,128,padding)
-		self.uconv4 = up(128,64,padding)
+		self.uconv1 = up(512,256,padding)
+		self.uconv2 = up(256,128,padding)
+		self.uconv3 = up(128,64,padding)
 
 		# 1x1 2D Convolution filter from 64 channels to n_channels
 		self.reduce = nn.Sequential(\
@@ -89,12 +87,10 @@ class UNet(nn.Module):
 		x1 = self.dconv1(x)
 		x2 = self.dconv2(x1)
 		x3 = self.dconv3(x2)
-		x4 = self.dconv4(x3)
-		x5 = self.bconv(x4)
-		x6 = self.uconv1(x5,x4)
-		x7 = self.uconv2(x6,x3)
-		x8 = self.uconv3(x7,x2)
-		x9 = self.uconv4(x8,x1)
-
-		x10 = self.reduce(x9)
-		return x10
+		x4 = self.bconv(x3)
+		x5 = self.uconv1(x4,x3)
+		x6 = self.uconv2(x5,x2)
+		x7 = self.uconv3(x6,x1)
+		
+		x8 = self.reduce(x7)
+		return x8
