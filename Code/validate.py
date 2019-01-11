@@ -55,8 +55,7 @@ def validate(display=False):
 			testimg = dataiter.next()
 			img, lbl = testimg['image'], testimg['label']
 			trained = model(img)
-			thresholded = (trained > torch.tensor([0.5]))
-			
+			thresholded = (trained > torch.tensor([0.6]))
 			if display:
 				T.ToPILImage()(img[0]).show()
 				T.ToPILImage()(lbl.float()).show()
@@ -69,12 +68,12 @@ def validate(display=False):
 			FN = ((thresholded[0].long() != lbl.long()) & (thresholded[0].long() == 0)).sum()
 			matching = (thresholded[0].long() == lbl.long()).sum()
 			accuracy = float(matching) / lbl.numel()
-			print("matching {}, total {}, accuracy {}".format(matching, lbl.numel(), accuracy))
+#			print("matching {}, total {}, accuracy {}".format(matching, lbl.numel(), accuracy))
 			try:
 				precision = float(TP.float()/(TP.float()+FP.float()))
 				recall = float(TP.float()/(TP.float()+FN.float()))
 				F1 = float(2*precision*recall/(precision + recall))
-				print("\taccuracy {}, precision {}, F1 score{}".format(accuracy, precision, F1))
+				print("accuracy {}, precision {}, recall {}, F1 score{}".format(accuracy, precision, recall, F1))
 			except FloatingPointError:
 				continue
 			except ZeroDivisionError:
