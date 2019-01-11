@@ -34,12 +34,12 @@ def get_checkpoint(model, optimizer, loss):
       checkpoint = torch.load(filename, map_location=map_location)
       model.load_state_dict(checkpoint['state_dict'])
       optimizer.load_state_dict(checkpoint['optimizer'])
-      loss.append(checkpoint['loss_log'][0])
+      loss.extend(checkpoint['loss_log'][0])
 
 #def train(epochs, lr, momentum, decay, display):
 def train(epochs=10, lr=0.001, display=False, save=False, load=False):
     #optimizer = torch.optim.SGD(model.parameters(), lr = lr, momentum = momentum, weight_decay = decay)
-    optimizer = torch.optim.Adam(model.parameters(),lr = 0.0001)
+    optimizer = torch.optim.Adam(model.parameters(),lr = lr)
     loss_log = []
 
     if load:
