@@ -22,7 +22,6 @@ dataset = Segmentation(transform = Compose([ \
 ]))
 
 # Neural network
-model = UNet(n_class = 1).cuda() if torch.cuda.is_available() else UNet(n_class = 1)
 
 def save_checkpoint(checkpt, filename):
     torch.save(checkpt,filename)
@@ -37,8 +36,9 @@ def get_checkpoint(model, optimizer, loss):
       loss.extend(checkpoint['loss_log'])
 
 #def train(epochs, lr, momentum, decay, display):
-def train(epochs=10, lr=0.001, display=False, save=False, load=False):
+def train(epochs=10, lr=0.001, n_class=1, in_channel=1, display=False, save=False, load=False):
     #optimizer = torch.optim.SGD(model.parameters(), lr = lr, momentum = momentum, weight_decay = decay)
+    model = UNet(n_class, in_channel).cuda() if torch.cuda.is_available() else UNet(n_class = 1)
     optimizer = torch.optim.Adam(model.parameters(),lr = lr)
     loss_log = []
 

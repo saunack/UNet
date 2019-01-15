@@ -55,10 +55,10 @@ class up(nn.Module):
 		return self.conv(x)
 		
 class UNet(nn.Module):
-	def __init__(self, n_class=2, padding=0):
+	def __init__(self, n_class=2, in_channel=1, padding=0):
 		super(UNet, self).__init__()
 
-		self.dconv1 = Conv(1,64,padding)
+		self.dconv1 = Conv(in_channel,64,padding)
 		self.dconv2 = down(64,128,padding)
 		self.dconv3 = down(128,256,padding)
 		self.dconv4 = down(256,512,padding)

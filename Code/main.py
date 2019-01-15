@@ -9,6 +9,8 @@ def get_options():
     parser.add_argument("-lr",type=float,dest="lr",help="learning rate",default=0.001)
     #parser.add_argument("-d","--decay",type=float,dest="decay",help="weight decay",default=0.005)
     #parser.add_argument("-m","--momentum",type=float,dest="momentum",help="learning momentum",default=0.9)
+    parser.add_argument("-n","--n_class", type=int, dest="n_class", help="number of segments", default=1)
+    parser.add_argument("-i","--in_channel", type=int, dest="in_channel", help="number of input channels", default=1)
     parser.add_argument("--display", action = 'store_true')
     parser.add_argument("--save", action = 'store_true')
     parser.add_argument("--load", action = 'store_true')
@@ -21,6 +23,6 @@ def get_options():
     elif args.validate:
         validate(args.display)
     else:
-        train(args.epochs, args.lr, args.display, save=args.save, load=args.load)
+        train(args.epochs, args.lr, args.n_class, args.in_channel, args.display, save=args.save, load=args.load)
 
-get_options()
+#get_options()
