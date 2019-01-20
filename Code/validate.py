@@ -50,17 +50,37 @@ def validate(display=False):
 	testloader = DataLoader(dataset=dataset, batch_size=1, shuffle=True)
 	dataiter = iter(testloader)
 
+	i = 1
+	
 	while True:
 		try:
 			testimg = dataiter.next()
 			img, lbl = testimg['image'], testimg['label']
 			trained = model(img)
 			thresholded = (trained > torch.tensor([0.6]))
+			
+			image = T.ToPILImage()(img[0])
+			label = T.ToPILImage()(lbl.float())
+			trained_img = T.ToPILImage()((trained[0]).float())
+			threshold_img = T.ToPILImage()((thresholded[0]).float())
+
+			directory = "../Results/"
+			
+			if not os.path.exists(directory):
+				os.makedirs(directory)
+			
+			image.save(directory + str(i)+'_data.png',"PNG")
+			label.save(directory + str(i)+'_label.png',"PNG")
+			threshold_img.save(directory + str(i)+'_thresholded.png',"PNG")
+			trained_img.save(directory + str(i)+'_training_output.png',"PNG")
+			
+			i = i + 1
+			
 			if display:
-				T.ToPILImage()(img[0]).show()
-				T.ToPILImage()(lbl.float()).show()
-				T.ToPILImage()((trained[0]).float()).show()
-				T.ToPILImage()((thresholded[0]).float()).show()
+				image.show()
+				label.show()
+				trained_img.show()
+				threshold_img.show()
 
 			TP = ((thresholded[0].long() == lbl.long()) & (thresholded[0].long() == 1)).sum()
 			TN = ((thresholded[0].long() == lbl.long()) & (thresholded[0].long() == 0)).sum()
