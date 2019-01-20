@@ -82,12 +82,6 @@ def validate(display=False):
 				trained_img.show()
 				threshold_img.show()
 
-			#if display:
-				#T.ToPILImage()(img[0]).show()
-				#T.ToPILImage()(lbl.float()).show()
-				#T.ToPILImage()((trained[0]).float()).show()
-				#T.ToPILImage()((thresholded[0]).float()).show()
-
 			TP = ((thresholded[0].long() == lbl.long()) & (thresholded[0].long() == 1)).sum()
 			TN = ((thresholded[0].long() == lbl.long()) & (thresholded[0].long() == 0)).sum()
 			FP = ((thresholded[0].long() != lbl.long()) & (thresholded[0].long() == 1)).sum()
