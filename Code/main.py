@@ -25,4 +25,4 @@ def get_options():
     else:
         train(args.epochs, args.lr, args.n_class, args.in_channel, args.display, save=args.save, load=args.load)
 
-#get_options()
+get_options()
